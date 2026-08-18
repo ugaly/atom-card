@@ -318,16 +318,9 @@ function ManualForm() {
     setSubmitting(true);
     try {
       await submitToWeb3Forms({
-        subject: `AtomCard order — ${company} (${numUsers} card${numUsers === 1 ? "" : "s"})`,
         name: company,
         email: companyEmail,
-        phone: companyPhone || undefined,
-        from_name: company,
-        company,
-        website: website || undefined,
-        location: location || undefined,
-        team_size: String(numUsers),
-        submission_type: "guided_form",
+        subject: `AtomCard order — ${company} (${numUsers} card${numUsers === 1 ? "" : "s"})`,
         message,
       });
       setSubmitted(true);
@@ -1044,13 +1037,9 @@ function ExcelOption() {
     setSubmitting(true);
     try {
       await submitToWeb3Forms({
-        subject: `AtomCard order — Excel (${rows.length} row${rows.length === 1 ? "" : "s"}) — ${fileName}`,
         name: firstName,
         email: replyEmail,
-        from_name: firstName,
-        submission_type: "excel_upload",
-        file_name: fileName,
-        row_count: String(rows.length),
+        subject: `AtomCard order — Excel (${rows.length} row${rows.length === 1 ? "" : "s"}) — ${fileName}`,
         message,
       });
       setSubmitted(true);

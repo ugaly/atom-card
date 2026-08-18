@@ -1,27 +1,16 @@
 const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
 
-export function getWeb3FormsAccessKey() {
-  return (import.meta.env.VITE_WEB3FORMS_ACCESS_KEY as string | undefined)?.trim() || "";
-}
+/** Public Web3Forms access key (safe to use client-side). */
+export const WEB3FORMS_ACCESS_KEY = "26c92a7d-6fee-41c6-9ba5-ff21d1233ab1";
 
 export type Web3FormPayload = {
-  subject: string;
-  name?: string;
-  email?: string;
-  phone?: string;
+  name: string;
+  email: string;
   message: string;
-  from_name?: string;
-  [key: string]: string | undefined;
+  subject?: string;
 };
 
-export async function submitToWeb3Forms(payload: Web3FormPayload) {
-  const accessKey = getWeb3FormsAccessKey();
-  if (!accessKey) {
-    throw new Error(
-      "Web3Forms is not configured. Add VITE_WEB3FORMS_ACCESS_KEY to your .env file.",
-    );
-  }
-
+export async function submitToWeb3Forms({ name, email, message, subject }: Web3FormPayload) {
   const response = await fetch(WEB3FORMS_ENDPOINT, {
     method: "POST",
     headers: {
@@ -29,9 +18,13 @@ export async function submitToWeb3Forms(payload: Web3FormPayload) {
       Accept: "application/json",
     },
     body: JSON.stringify({
-      access_key: accessKey,
+      access_key: WEB3FORMS_ACCESS_KEY,
+      name,
+      email,
+      message,
+      subject: subject || "New submission from AtomCard",
+      from_name: "AtomCard website",
       botcheck: false,
-      ...payload,
     }),
   });
 

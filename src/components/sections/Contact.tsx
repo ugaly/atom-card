@@ -27,13 +27,12 @@ export function Contact() {
     setSending(true);
     try {
       await submitToWeb3Forms({
-        subject: `AtomCard contact — ${company}`,
         name,
         email,
-        from_name: name,
-        company,
-        employees: employees || "Not specified",
+        subject: `AtomCard contact — ${company}`,
         message: [
+          "WEBSITE CONTACT",
+          "",
           `Name: ${name}`,
           `Email: ${email}`,
           `Company: ${company}`,
