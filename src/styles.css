@@ -211,18 +211,19 @@
   display: flex;
   align-items: center;
   gap: 0;
-  height: 2.75rem;
+  height: 3rem;
   width: 100%;
-  border-radius: var(--radius);
-  border: 1px solid var(--input);
-  background: var(--background);
-  box-shadow: 0 1px 2px oklch(0 0 0 / 0.03);
+  border-radius: 0.75rem;
+  border: 1.5px solid oklch(0.82 0.02 255);
+  background: oklch(0.985 0.005 255);
+  box-shadow: none;
   transition: border-color 0.15s, box-shadow 0.15s;
   overflow: hidden;
 }
 .PhoneInput--atomcard:focus-within {
   border-color: var(--ring);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 20%, transparent);
+  background: white;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
 }
 .PhoneInput--atomcard .PhoneInputCountry {
   margin: 0;

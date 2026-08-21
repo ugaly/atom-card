@@ -32,7 +32,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, Props>(
         className={cn("PhoneInput--atomcard", className)}
         numberInputProps={{
           className:
-            "PhoneInputInput flex h-11 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/60",
+            "PhoneInputInput flex h-12 w-full bg-transparent text-base outline-none placeholder:text-muted-foreground/60 md:text-sm",
         }}
       />
     );

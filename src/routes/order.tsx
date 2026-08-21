@@ -15,28 +15,11 @@ import {
   FileText,
   X,
   Eye,
-  ClipboardList,
-  Building2,
-  Users,
-  Globe,
-  Share2,
-  Palette,
-  Phone,
+  Minus,
   Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -44,7 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -62,7 +44,8 @@ export const Route = createFileRoute("/order")({
       { title: "Order your AtomCards — Team card request" },
       {
         name: "description",
-        content: "Request AtomCards for your team. Fill a form with your details or upload a spreadsheet.",
+        content:
+          "Request AtomCards for your team. Fill a form with your details or upload a spreadsheet.",
       },
     ],
   }),
@@ -126,84 +109,76 @@ const emptyUser = (): UserEntry => ({
   emails: [{ address: "", kind: "work" }],
 });
 
-const fieldClass = "space-y-2";
+const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
+const underlineInput =
+  "w-full border-0 border-b-2 border-solid border-black/15 bg-transparent px-0 py-3 text-base text-ink outline-none transition placeholder:text-black/35 focus:border-primary focus:ring-0 rounded-none shadow-none";
 
 function OrderPage() {
+  const [tab, setTab] = useState<"form" | "excel">("form");
+
   return (
-    <main className="min-h-screen bg-surface text-ink bg-mesh">
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5">
-          <Link to="/" className="flex items-center gap-2 font-semibold text-ink">
+    <main className="min-h-dvh bg-[#D3E3FD] text-ink">
+      <header className="sticky top-0 z-40 border-b border-black/8 bg-white/95 shadow-sm backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-[720px] items-center justify-between px-4 sm:px-0">
+          <Link to="/" className="flex items-center gap-2.5 font-semibold">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-brand text-white">
               <Nfc className="h-4 w-4" />
             </span>
             <span className="tracking-tight">AtomCard</span>
           </Link>
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/">
-              <ArrowLeft className="h-4 w-4" /> Back
-            </Link>
-          </Button>
+          <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/70 hover:text-ink">
+            <ArrowLeft className="h-4 w-4" /> Back
+          </Link>
         </div>
       </header>
 
-      <section className="mx-auto max-w-5xl px-5 py-12 md:py-16">
-        <div className="max-w-2xl">
-          <Badge variant="secondary" className="rounded-full px-3 font-mono-tech text-[10px] uppercase tracking-[0.2em]">
-            Order form
-          </Badge>
-          <h1 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">
-            Request cards for your team
-          </h1>
-          <p className="mt-3 text-muted-foreground">
-            Fill in company and personal details online, or download the Excel template and upload it when ready.
-          </p>
+      <div className="mx-auto max-w-[720px] px-3 py-6 sm:px-4 sm:py-10">
+        <div className="mb-5 flex justify-center gap-1 rounded-full border border-black/8 bg-white p-1.5 shadow-md">
+          <button
+            type="button"
+            onClick={() => setTab("form")}
+            className={cn(
+              "rounded-full px-5 py-2.5 text-sm font-semibold transition",
+              tab === "form" ? "bg-primary text-white shadow-sm" : "text-ink/60 hover:bg-black/5 hover:text-ink",
+            )}
+          >
+            Fill form
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("excel")}
+            className={cn(
+              "rounded-full px-5 py-2.5 text-sm font-semibold transition",
+              tab === "excel" ? "bg-primary text-white shadow-sm" : "text-ink/60 hover:bg-black/5 hover:text-ink",
+            )}
+          >
+            Upload Excel
+          </button>
         </div>
 
-        <Tabs defaultValue="form" className="mt-10">
-          <TabsList className="grid h-12 w-full max-w-lg grid-cols-2 rounded-xl bg-muted/80 p-1.5">
-            <TabsTrigger
-              value="form"
-              className="h-9 gap-2 rounded-lg text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <ClipboardList className="h-4 w-4" />
-              Guided form
-            </TabsTrigger>
-            <TabsTrigger
-              value="excel"
-              className="h-9 gap-2 rounded-lg text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <FileSpreadsheet className="h-4 w-4" />
-              Excel upload
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="form" className="mt-8 focus-visible:ring-0">
-            <ManualForm />
-          </TabsContent>
-
-          <TabsContent value="excel" className="mt-8 focus-visible:ring-0">
-            <ExcelOption />
-          </TabsContent>
-        </Tabs>
-      </section>
+        {tab === "form" ? <GoogleStyleForm /> : <ExcelOption />}
+      </div>
     </main>
   );
 }
 
-function ManualForm() {
+function GoogleStyleForm() {
+  const [activeId, setActiveId] = useState<string | null>("company-name");
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   const [company, setCompany] = useState("");
   const [website, setWebsite] = useState("");
   const [location, setLocation] = useState("");
   const [companyEmail, setCompanyEmail] = useState("");
   const [companyPhone, setCompanyPhone] = useState<PhoneValue | undefined>();
   const [cardStructure, setCardStructure] = useState("");
-  const [socials, setSocials] = useState<SocialEntry[]>([{ name: "", url: "" }]);
+  const [socials, setSocials] = useState<SocialEntry[]>([]);
   const [logos, setLogos] = useState<LogoItem[]>([]);
   const [numUsers, setNumUsers] = useState(1);
   const [users, setUsers] = useState<UserEntry[]>([emptyUser()]);
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     return () => {
@@ -234,7 +209,7 @@ function ManualForm() {
       (f) => /image\/|svg|pdf/i.test(f.type) || /\.(png|jpe?g|gif|webp|svg|pdf)$/i.test(f.name),
     );
     if (!incoming.length) {
-      toast.error("Please upload image or PDF logo files.");
+      toast.error("Please upload PNG, JPG, SVG, or PDF files.");
       return;
     }
     const items: LogoItem[] = incoming.map((file) => ({
@@ -255,28 +230,35 @@ function ManualForm() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!company.trim()) return toast.error("Company name is required.");
-    if (!companyEmail.trim()) return toast.error("Company email is required so we can reply.");
-    if (users.some((u) => !u.fullName.trim())) return toast.error("Every person needs a full name.");
+    const next: Record<string, string> = {};
+    if (!company.trim()) next.company = "Enter your company name";
+    if (!companyEmail.trim()) next.companyEmail = "Enter your company email";
+    else if (!isValidEmail(companyEmail)) next.companyEmail = "Enter a valid email address";
+    users.forEach((u, i) => {
+      if (!u.fullName.trim()) next[`user-${i}`] = "Enter a full name";
+    });
+    setErrors(next);
+    if (Object.keys(next).length) {
+      toast.error(Object.values(next)[0]);
+      const first = Object.keys(next)[0];
+      if (first === "company") setActiveId("company-name");
+      else if (first === "companyEmail") setActiveId("company-email");
+      return;
+    }
 
     const socialLines = socials
       .filter((s) => s.name.trim() || s.url.trim())
       .map((s) => `- ${s.name || "Link"}: ${s.url || "—"}`)
       .join("\n");
-
     const logoLines =
       logos.length > 0
         ? logos.map((l) => `- ${l.file.name} (${(l.file.size / 1024).toFixed(0)} KB)`).join("\n")
         : "- None uploaded";
-
     const peopleLines = users
       .map((u, i) => {
         const phones = u.phones
           .filter((p) => p.number)
-          .map(
-            (p) =>
-              `  Phone: ${p.number} (${p.kind}${p.whatsapp ? ", WhatsApp" : ""})`,
-          )
+          .map((p) => `  Phone: ${p.number} (${p.kind}${p.whatsapp ? ", WhatsApp" : ""})`)
           .join("\n");
         const emails = u.emails
           .filter((em) => em.address.trim())
@@ -324,7 +306,7 @@ function ManualForm() {
         message,
       });
       setSubmitted(true);
-      toast.success("Request submitted — we'll be in touch shortly.");
+      toast.success("Order submitted — we'll be in touch shortly.");
     } catch (err) {
       console.error(err);
       toast.error(err instanceof Error ? err.message : "Could not submit request.");
@@ -335,375 +317,493 @@ function ManualForm() {
 
   if (submitted) {
     return (
-      <Card className="border-border shadow-lift">
-        <CardContent className="p-10 text-center">
-          <CheckCircle2 className="mx-auto h-12 w-12 text-primary" />
-          <h3 className="mt-4 text-2xl font-semibold">Thanks — we got it.</h3>
-          <p className="mt-2 text-muted-foreground">
-            Our team will reach out on{" "}
-            <span className="text-ink">{companyEmail || "the email you provided"}</span> within 1
-            business day with a quote and preview.
+      <FormCard active accent>
+        <div className="py-8 text-center">
+          <CheckCircle2 className="mx-auto h-14 w-14 text-primary" />
+          <h2 className="mt-5 text-2xl font-medium tracking-tight text-ink">Your AtomCards order has been received</h2>
+          <p className="mt-3 text-[15px] leading-relaxed text-ink/65">
+            Thanks! We&apos;ve received your details and will contact you on{" "}
+            <span className="font-medium text-ink">{companyEmail}</span> if anything needs clarification.
           </p>
-          <Button asChild className="mt-6 rounded-full">
-            <Link to="/">Back to homepage</Link>
+          <Button asChild className="mt-8 h-12 rounded-full px-8 text-base font-semibold">
+            <Link to="/">Back to AtomCards</Link>
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </FormCard>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
-      <FormSection
-        icon={Building2}
-        step="01"
-        title="Company details"
-        description="Shared business info for every card. Fill what you know — we’ll confirm the rest."
-      >
-        <div className="space-y-5">
-          <SubPanel
-            icon={Building2}
-            title="Business identity"
-            hint="How your company should appear on the order"
-          >
-            <div className="grid gap-5 md:grid-cols-2">
-              <div className={fieldClass}>
-                <Label htmlFor="company">
-                  Company name <span className="text-primary">*</span>
-                </Label>
-                <Input
-                  id="company"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  placeholder="e.g. Northwind Studio"
-                  autoComplete="organization"
-                />
-              </div>
-              <div className={fieldClass}>
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="City, country"
-                  autoComplete="address-level2"
-                />
-              </div>
-            </div>
-          </SubPanel>
-
-          <SubPanel
-            icon={Phone}
-            title="Contact"
-            hint="Main number and email we can reach you on"
-          >
-            <div className="grid gap-5 md:grid-cols-2">
-              <div className={fieldClass}>
-                <Label>Company phone</Label>
-                <PhoneInput
-                  value={companyPhone}
-                  onChange={setCompanyPhone}
-                  defaultCountry="TZ"
-                />
-                <p className="text-[11px] text-muted-foreground">Defaults to Tanzania (+255)</p>
-              </div>
-              <div className={fieldClass}>
-                <Label htmlFor="companyEmail">
-                  Company email <span className="text-primary">*</span>
-                </Label>
-                <Input
-                  id="companyEmail"
-                  type="email"
-                  value={companyEmail}
-                  onChange={(e) => setCompanyEmail(e.target.value)}
-                  placeholder="hello@company.com"
-                  autoComplete="email"
-                />
-              </div>
-            </div>
-          </SubPanel>
-
-          <SubPanel
-            icon={Globe}
-            title="Online presence"
-            hint="Website and social profiles for digital cards"
-          >
-            <div className={fieldClass}>
-              <Label htmlFor="website">Website</Label>
-              <Input
-                id="website"
-                type="url"
-                value={website}
-                onChange={(e) => setWebsite(e.target.value)}
-                placeholder="https://"
-                autoComplete="url"
-              />
-            </div>
-
-            <div className="mt-5 space-y-3">
-              <div className="flex items-center gap-2">
-                <Share2 className="h-3.5 w-3.5 text-primary" />
-                <Label>Social links</Label>
-              </div>
-              {socials.map((s, i) => (
-                <div key={i} className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_auto]">
-                  <Input
-                    value={s.name}
-                    onChange={(e) =>
-                      setSocials((prev) => prev.map((x, idx) => (idx === i ? { ...x, name: e.target.value } : x)))
-                    }
-                    placeholder="LinkedIn"
-                    aria-label="Platform"
-                  />
-                  <Input
-                    value={s.url}
-                    onChange={(e) =>
-                      setSocials((prev) => prev.map((x, idx) => (idx === i ? { ...x, url: e.target.value } : x)))
-                    }
-                    placeholder="https://"
-                    aria-label="Profile URL"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="h-11 w-11 shrink-0"
-                    onClick={() =>
-                      setSocials((prev) => (prev.length > 1 ? prev.filter((_, idx) => idx !== i) : prev))
-                    }
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setSocials((prev) => [...prev, { name: "", url: "" }])}
-              >
-                <Plus className="h-4 w-4" /> Add link
-              </Button>
-            </div>
-          </SubPanel>
-
-          <SubPanel
-            icon={Palette}
-            title="Brand & design"
-            hint="Logos and notes for how cards should look"
-          >
-            <div className="space-y-3">
-              <div>
-                <Label>Company logo</Label>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  One or more files · PNG, SVG, JPG, or PDF · click a card to preview
-                </p>
-              </div>
-              <LogoUploader logos={logos} onAdd={addLogos} onRemove={removeLogo} />
-            </div>
-
-            <div className={cn(fieldClass, "mt-5")}>
-              <Label htmlFor="design">Design notes</Label>
-              <Textarea
-                id="design"
-                rows={4}
-                value={cardStructure}
-                onChange={(e) => setCardStructure(e.target.value)}
-                placeholder="Colors, layout, front vs back, materials…"
-              />
-            </div>
-          </SubPanel>
+    <form onSubmit={onSubmit} className="space-y-3.5 pb-10">
+      {/* Header card — Google Forms style */}
+      <FormCard active={activeId === "header"} accent onActivate={() => setActiveId("header")}>
+        <h1 className="text-[28px] font-medium leading-tight tracking-tight text-ink sm:text-[32px]">
+          Order your AtomCards
+        </h1>
+        <div className="mt-4 border-t border-black/10 pt-4">
+          <p className="text-[15px] leading-relaxed text-ink/70">
+            Tell us about your company and the people who need cards. We&apos;ll use these details to prepare your
+            digital business cards.
+          </p>
         </div>
-      </FormSection>
+        <p className="mt-5 text-sm font-medium text-destructive">* Indicates required question</p>
+      </FormCard>
 
-      <FormSection
-        icon={Users}
-        step="02"
-        title="People"
-        description="One person per card. Set the count, then fill each person’s details."
-        action={
-          <div className="flex items-center gap-3">
-            <Label htmlFor="numUsers" className="whitespace-nowrap text-xs text-muted-foreground">
-              Team size
-            </Label>
-            <Input
-              id="numUsers"
-              type="number"
-              min={1}
-              max={200}
-              value={numUsers}
-              onChange={(e) => setUserCount(Number(e.target.value))}
-              className="h-9 w-20"
-            />
-          </div>
-        }
+      {/* Section: Company */}
+      <SectionTitle>Company details</SectionTitle>
+
+      <QuestionCard
+        id="company-name"
+        activeId={activeId}
+        setActiveId={setActiveId}
+        label="Company name"
+        required
+        error={errors.company}
       >
-        <div className="space-y-4">
-          {users.map((u, i) => (
-            <UserBlock key={i} index={i} user={u} onChange={(patch) => updateUser(i, patch)} />
+        <input
+          className={underlineInput}
+          value={company}
+          onChange={(e) => setCompany(e.target.value)}
+          placeholder="Your answer"
+          autoComplete="organization"
+        />
+      </QuestionCard>
+
+      <QuestionCard id="location" activeId={activeId} setActiveId={setActiveId} label="Location">
+        <input
+          className={underlineInput}
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="e.g. Dar es Salaam, Tanzania"
+          autoComplete="address-level2"
+        />
+      </QuestionCard>
+
+      <QuestionCard
+        id="company-phone"
+        activeId={activeId}
+        setActiveId={setActiveId}
+        label="Company phone"
+        hint="Defaults to Tanzania (+255)"
+      >
+        <div className="pt-1">
+          <PhoneInput value={companyPhone} onChange={setCompanyPhone} defaultCountry="TZ" />
+        </div>
+      </QuestionCard>
+
+      <QuestionCard
+        id="company-email"
+        activeId={activeId}
+        setActiveId={setActiveId}
+        label="Company email"
+        required
+        error={errors.companyEmail}
+      >
+        <input
+          type="email"
+          className={underlineInput}
+          value={companyEmail}
+          onChange={(e) => setCompanyEmail(e.target.value)}
+          placeholder="Your answer"
+          autoComplete="email"
+        />
+      </QuestionCard>
+
+      <SectionTitle>Online presence</SectionTitle>
+
+      <QuestionCard id="website" activeId={activeId} setActiveId={setActiveId} label="Website">
+        <input
+          type="url"
+          className={underlineInput}
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+          placeholder="https://yourcompany.com"
+          autoComplete="url"
+        />
+      </QuestionCard>
+
+      <QuestionCard
+        id="socials"
+        activeId={activeId}
+        setActiveId={setActiveId}
+        label="Social links"
+        hint="Optional — add profiles you want on the digital card"
+      >
+        <div className="space-y-4 pt-2">
+          {socials.map((s, i) => (
+            <div key={i} className="space-y-2">
+              <input
+                className={underlineInput}
+                value={s.name}
+                onChange={(e) =>
+                  setSocials((prev) => prev.map((x, idx) => (idx === i ? { ...x, name: e.target.value } : x)))
+                }
+                placeholder="Platform (e.g. LinkedIn)"
+              />
+              <div className="flex items-end gap-2">
+                <input
+                  className={cn(underlineInput, "flex-1")}
+                  value={s.url}
+                  onChange={(e) =>
+                    setSocials((prev) => prev.map((x, idx) => (idx === i ? { ...x, url: e.target.value } : x)))
+                  }
+                  placeholder="URL"
+                />
+                <button
+                  type="button"
+                  className="mb-2 rounded-full p-2 text-muted-foreground hover:bg-black/5 hover:text-ink"
+                  onClick={() => setSocials((prev) => prev.filter((_, idx) => idx !== i))}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           ))}
+          <button
+            type="button"
+            onClick={() => setSocials((prev) => [...prev, { name: "", url: "" }])}
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3.5 py-2 text-sm font-semibold text-primary transition hover:bg-primary/15"
+          >
+            <Plus className="h-4 w-4" /> Add social link
+          </button>
         </div>
-      </FormSection>
+      </QuestionCard>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card px-5 py-4 shadow-sm">
-        <p className="max-w-md text-xs text-muted-foreground">
-          A designer will confirm missing details with you before printing.
-        </p>
-        <Button type="submit" size="lg" disabled={submitting} className="h-11 rounded-full px-8">
+      <SectionTitle>Branding</SectionTitle>
+
+      <QuestionCard
+        id="logo"
+        activeId={activeId}
+        setActiveId={setActiveId}
+        label="Company logo"
+        hint="PNG, JPG, SVG or PDF"
+      >
+        <div className="pt-2">
+          <LogoUploader logos={logos} onAdd={addLogos} onRemove={removeLogo} />
+        </div>
+      </QuestionCard>
+
+      <QuestionCard
+        id="design"
+        activeId={activeId}
+        setActiveId={setActiveId}
+        label="Design notes"
+        hint="Anything important about how you want the cards to look"
+      >
+        <textarea
+          rows={3}
+          className={cn(underlineInput, "resize-y")}
+          value={cardStructure}
+          onChange={(e) => setCardStructure(e.target.value)}
+          placeholder="Your answer"
+        />
+      </QuestionCard>
+
+      <SectionTitle>Team &amp; people</SectionTitle>
+
+      <QuestionCard
+        id="team-size"
+        activeId={activeId}
+        setActiveId={setActiveId}
+        label="How many AtomCards do you need?"
+        hint="Each person gets their own digital business card"
+      >
+        <div className="flex items-center gap-4 pt-3">
+          <button
+            type="button"
+            onClick={() => setUserCount(numUsers - 1)}
+            disabled={numUsers <= 1}
+            className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-black/15 bg-[#F8F9FA] text-ink transition hover:border-primary/40 disabled:opacity-40"
+          >
+            <Minus className="h-4 w-4" />
+          </button>
+          <span className="min-w-[2.5rem] text-center text-3xl font-semibold tabular-nums text-ink">{numUsers}</span>
+          <button
+            type="button"
+            onClick={() => setUserCount(numUsers + 1)}
+            disabled={numUsers >= 200}
+            className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-black/15 bg-[#F8F9FA] text-ink transition hover:border-primary/40 disabled:opacity-40"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        </div>
+      </QuestionCard>
+
+      {users.map((user, i) => (
+        <PersonCards
+          key={i}
+          index={i}
+          user={user}
+          activeId={activeId}
+          setActiveId={setActiveId}
+          error={errors[`user-${i}`]}
+          onChange={(patch) => updateUser(i, patch)}
+        />
+      ))}
+
+      <div className="flex flex-col items-center gap-3 pt-6">
+        <Button type="submit" disabled={submitting} className="h-12 min-w-[160px] rounded-full px-10 text-base font-semibold shadow-md">
           {submitting ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" /> Sending…
+              <Loader2 className="h-4 w-4 animate-spin" /> Submitting…
             </>
           ) : (
-            "Submit request"
+            "Submit"
           )}
         </Button>
+        <p className="text-xs text-ink/50">Never submit passwords through this form.</p>
       </div>
     </form>
   );
 }
 
-function UserBlock({
+function SectionTitle({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 px-1 pb-0.5 pt-5">
+      <span className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-sm">
+        {children}
+      </span>
+      <span className="h-px flex-1 bg-primary/25" />
+    </div>
+  );
+}
+
+function FormCard({
+  children,
+  active,
+  accent,
+  onActivate,
+  className,
+}: {
+  children: ReactNode;
+  active?: boolean;
+  accent?: boolean;
+  onActivate?: () => void;
+  className?: string;
+}) {
+  return (
+    <div
+      role={onActivate ? "button" : undefined}
+      tabIndex={onActivate ? 0 : undefined}
+      onClick={onActivate}
+      onKeyDown={
+        onActivate
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") onActivate();
+            }
+          : undefined
+      }
+      className={cn(
+        "relative overflow-hidden rounded-xl border bg-white px-5 py-5 transition-shadow sm:px-7 sm:py-6",
+        active
+          ? "border-primary/20 shadow-[0_2px_8px_rgba(27,77,255,0.12),0_1px_3px_rgba(60,64,67,0.1)]"
+          : "border-black/10 shadow-[0_1px_3px_rgba(60,64,67,0.12),0_2px_8px_rgba(60,64,67,0.08)]",
+        className,
+      )}
+    >
+      {accent && <div className="absolute inset-x-0 top-0 h-[12px] bg-primary" />}
+      {active && !accent && (
+        <div className="absolute inset-y-0 left-0 w-[7px] rounded-l-xl bg-[#1A73E8]" />
+      )}
+      <div className={cn(accent && "pt-3", active && !accent && "pl-2")}>{children}</div>
+    </div>
+  );
+}
+
+function QuestionCard({
+  id,
+  activeId,
+  setActiveId,
+  label,
+  required,
+  hint,
+  error,
+  children,
+}: {
+  id: string;
+  activeId: string | null;
+  setActiveId: (id: string) => void;
+  label: string;
+  required?: boolean;
+  hint?: string;
+  error?: string;
+  children: ReactNode;
+}) {
+  const active = activeId === id;
+  return (
+    <FormCard active={active} onActivate={() => setActiveId(id)}>
+      <label className="block text-[17px] font-medium leading-snug text-ink">
+        {label}
+        {required ? <span className="ml-1 text-destructive">*</span> : null}
+      </label>
+      {hint ? <p className="mt-1.5 text-sm leading-relaxed text-ink/55">{hint}</p> : null}
+      <div className="mt-5" onFocus={() => setActiveId(id)}>
+        {children}
+      </div>
+      {error ? (
+        <p className="mt-3 rounded-md bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive">{error}</p>
+      ) : null}
+    </FormCard>
+  );
+}
+
+function PersonCards({
   index,
   user,
+  activeId,
+  setActiveId,
   onChange,
+  error,
 }: {
   index: number;
   user: UserEntry;
+  activeId: string | null;
+  setActiveId: (id: string) => void;
   onChange: (patch: Partial<UserEntry>) => void;
+  error?: string;
 }) {
-  const addPhone = () =>
-    onChange({ phones: [...user.phones, { number: undefined, kind: "personal", whatsapp: false }] });
-  const removePhone = (i: number) =>
-    onChange({ phones: user.phones.length > 1 ? user.phones.filter((_, idx) => idx !== i) : user.phones });
   const setPhone = (i: number, patch: Partial<PhoneEntry>) =>
     onChange({ phones: user.phones.map((p, idx) => (idx === i ? { ...p, ...patch } : p)) });
-
-  const addEmail = () => onChange({ emails: [...user.emails, { address: "", kind: "work" }] });
-  const removeEmail = (i: number) =>
-    onChange({ emails: user.emails.length > 1 ? user.emails.filter((_, idx) => idx !== i) : user.emails });
   const setEmail = (i: number, patch: Partial<EmailEntry>) =>
     onChange({ emails: user.emails.map((e, idx) => (idx === i ? { ...e, ...patch } : e)) });
 
-  return (
-    <Card className="border-border/80 bg-surface/40 shadow-none">
-      <CardHeader className="flex flex-row items-center gap-3 space-y-0 pb-4">
-        <Badge className="h-7 w-7 justify-center rounded-full p-0 text-xs">{index + 1}</Badge>
-        <div>
-          <CardTitle className="text-base">Person {index + 1}</CardTitle>
-          <CardDescription>Personal info for this card</CardDescription>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className={fieldClass}>
-            <Label>
-              Full name <span className="text-primary">*</span>
-            </Label>
-            <Input
-              value={user.fullName}
-              onChange={(e) => onChange({ fullName: e.target.value })}
-              placeholder="e.g. Alex Rivera"
-              autoComplete="name"
-            />
-          </div>
-          <div className={fieldClass}>
-            <Label>Job title</Label>
-            <Input
-              value={user.position}
-              onChange={(e) => onChange({ position: e.target.value })}
-              placeholder="e.g. Head of Sales"
-              autoComplete="organization-title"
-            />
-          </div>
-        </div>
+  const base = `person-${index}`;
 
-        <div className="space-y-3">
-          <div>
-            <Label>Phone</Label>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Country defaults to Tanzania (+255). Change the flag if needed.
-            </p>
-          </div>
+  return (
+    <>
+      <SectionTitle>
+        Card {String(index + 1).padStart(2, "0")} — person details
+      </SectionTitle>
+
+      <QuestionCard
+        id={`${base}-name`}
+        activeId={activeId}
+        setActiveId={setActiveId}
+        label="Full name"
+        required
+        error={error}
+      >
+        <input
+          className={underlineInput}
+          value={user.fullName}
+          onChange={(e) => onChange({ fullName: e.target.value })}
+          placeholder="Your answer"
+          autoComplete="name"
+        />
+      </QuestionCard>
+
+      <QuestionCard
+        id={`${base}-title`}
+        activeId={activeId}
+        setActiveId={setActiveId}
+        label="Job title"
+      >
+        <input
+          className={underlineInput}
+          value={user.position}
+          onChange={(e) => onChange({ position: e.target.value })}
+          placeholder="Your answer"
+          autoComplete="organization-title"
+        />
+      </QuestionCard>
+
+      <QuestionCard
+        id={`${base}-phone`}
+        activeId={activeId}
+        setActiveId={setActiveId}
+        label="Phone"
+        hint="Defaults to Tanzania (+255). Tick WhatsApp if that number works there."
+      >
+        <div className="space-y-4 pt-1">
           {user.phones.map((p, i) => (
-            <div key={i} className="space-y-3 rounded-xl border border-border bg-card p-3.5">
-              <div className="grid gap-3 md:grid-cols-[1fr_auto]">
-                <PhoneInput
-                  value={p.number}
-                  onChange={(value) => setPhone(i, { number: value })}
-                  defaultCountry="TZ"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-11 w-11"
-                  onClick={() => removePhone(i)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
+            <div key={i} className="space-y-3 border-b border-black/5 pb-4 last:border-0 last:pb-0">
+              <PhoneInput value={p.number} onChange={(v) => setPhone(i, { number: v })} defaultCountry="TZ" />
+              <div className="flex flex-wrap items-center gap-4">
                 <Select value={p.kind} onValueChange={(v) => setPhone(i, { kind: v as PhoneEntry["kind"] })}>
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="Type" />
+                  <SelectTrigger className="h-9 w-[130px] rounded-md border-black/10 shadow-none">
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="personal">Personal</SelectItem>
                     <SelectItem value="office">Office</SelectItem>
                   </SelectContent>
                 </Select>
-                <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                <label className="flex items-center gap-2 text-sm text-ink">
                   <Checkbox checked={p.whatsapp} onCheckedChange={(v) => setPhone(i, { whatsapp: !!v })} />
                   WhatsApp
                 </label>
+                {user.phones.length > 1 && (
+                  <button
+                    type="button"
+                    className="text-sm text-muted-foreground hover:text-destructive"
+                    onClick={() => onChange({ phones: user.phones.filter((_, idx) => idx !== i) })}
+                  >
+                    Remove
+                  </button>
+                )}
               </div>
             </div>
           ))}
-          <Button type="button" variant="outline" size="sm" onClick={addPhone}>
+          <button
+            type="button"
+            onClick={() =>
+              onChange({ phones: [...user.phones, { number: undefined, kind: "personal", whatsapp: false }] })
+            }
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3.5 py-2 text-sm font-semibold text-primary transition hover:bg-primary/15"
+          >
             <Plus className="h-4 w-4" /> Add phone
-          </Button>
+          </button>
         </div>
+      </QuestionCard>
 
-        <div className="space-y-3">
-          <Label>Email</Label>
+      <QuestionCard
+        id={`${base}-email`}
+        activeId={activeId}
+        setActiveId={setActiveId}
+        label="Email"
+      >
+        <div className="space-y-4 pt-1">
           {user.emails.map((em, i) => (
-            <div key={i} className="space-y-3 rounded-xl border border-border bg-card p-3.5">
-              <div className="grid gap-3 md:grid-cols-[1fr_auto]">
-                <Input
-                  type="email"
-                  value={em.address}
-                  onChange={(e) => setEmail(i, { address: e.target.value })}
-                  placeholder="name@company.com"
-                  autoComplete="email"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-11 w-11"
-                  onClick={() => removeEmail(i)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+            <div key={i} className="space-y-3 border-b border-black/5 pb-4 last:border-0 last:pb-0">
+              <input
+                type="email"
+                className={underlineInput}
+                value={em.address}
+                onChange={(e) => setEmail(i, { address: e.target.value })}
+                placeholder="Your answer"
+              />
+              <div className="flex flex-wrap items-center gap-4">
+                <Select value={em.kind} onValueChange={(v) => setEmail(i, { kind: v as EmailEntry["kind"] })}>
+                  <SelectTrigger className="h-9 w-[130px] rounded-md border-black/10 shadow-none">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="work">Work</SelectItem>
+                    <SelectItem value="personal">Personal</SelectItem>
+                  </SelectContent>
+                </Select>
+                {user.emails.length > 1 && (
+                  <button
+                    type="button"
+                    className="text-sm text-muted-foreground hover:text-destructive"
+                    onClick={() => onChange({ emails: user.emails.filter((_, idx) => idx !== i) })}
+                  >
+                    Remove
+                  </button>
+                )}
               </div>
-              <Select value={em.kind} onValueChange={(v) => setEmail(i, { kind: v as EmailEntry["kind"] })}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="work">Work</SelectItem>
-                  <SelectItem value="personal">Personal</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           ))}
-          <Button type="button" variant="outline" size="sm" onClick={addEmail}>
+          <button
+            type="button"
+            onClick={() => onChange({ emails: [...user.emails, { address: "", kind: "work" }] })}
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3.5 py-2 text-sm font-semibold text-primary transition hover:bg-primary/15"
+          >
             <Plus className="h-4 w-4" /> Add email
-          </Button>
+          </button>
         </div>
-      </CardContent>
-    </Card>
+      </QuestionCard>
+    </>
   );
 }
 
@@ -720,14 +820,8 @@ function LogoUploader({
   const [dragging, setDragging] = useState(false);
   const [preview, setPreview] = useState<LogoItem | null>(null);
 
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragging(false);
-    if (e.dataTransfer.files?.length) onAdd(e.dataTransfer.files);
-  };
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <input
         ref={inputRef}
         type="file"
@@ -740,101 +834,87 @@ function LogoUploader({
         }}
       />
 
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={onDrop}
-        className={cn(
-          "flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-6 py-8 text-center transition-colors",
-          dragging
-            ? "border-primary bg-primary/5"
-            : "border-border bg-background hover:border-primary/35 hover:bg-primary/[0.02]",
-        )}
-      >
-        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <ImagePlus className="h-5 w-5" />
-        </span>
-        <span className="text-sm font-medium">Drop files here or browse</span>
-        <span className="text-xs text-muted-foreground">PNG, SVG, JPG, PDF</span>
-      </button>
-
-      {logos.length > 0 && (
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          {logos.map((logo) => {
-            const isImage = !!logo.previewUrl || logo.file.type.startsWith("image/");
-            return (
-              <li key={logo.id} className="group relative">
-                <button
-                  type="button"
-                  onClick={() => setPreview(logo)}
-                  className="flex w-full flex-col overflow-hidden rounded-xl border border-border bg-card text-left transition hover:border-primary/40 hover:shadow-sm"
-                >
-                  <div className="relative flex aspect-square items-center justify-center bg-muted/40">
-                    {logo.previewUrl ? (
-                      <img src={logo.previewUrl} alt={logo.file.name} className="h-full w-full object-contain p-2" />
-                    ) : (
-                      <FileText className="h-10 w-10 text-muted-foreground" />
-                    )}
-                    <span className="absolute inset-0 flex items-center justify-center bg-ink/0 opacity-0 transition group-hover:bg-ink/40 group-hover:opacity-100">
-                      <Eye className="h-5 w-5 text-white" />
-                    </span>
-                  </div>
-                  <div className="border-t border-border/60 px-2.5 py-2">
-                    <p className="truncate text-xs font-medium">{logo.file.name}</p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {isImage ? "Image" : "File"} · {(logo.file.size / 1024).toFixed(0)} KB
-                    </p>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  aria-label={`Remove ${logo.file.name}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRemove(logo.id);
-                  }}
-                  className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition hover:bg-destructive hover:text-destructive-foreground"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </li>
-            );
-          })}
+      {logos.length === 0 ? (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragging(false);
+            if (e.dataTransfer.files?.length) onAdd(e.dataTransfer.files);
+          }}
+          className={cn(
+            "flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-9 text-center transition",
+            dragging ? "border-primary bg-primary/5" : "border-black/20 bg-[#F8F9FA] hover:border-primary/50",
+          )}
+        >
+          <ImagePlus className="h-7 w-7 text-primary" />
+          <span className="text-[15px] font-semibold text-ink">Upload company logo</span>
+          <span className="text-sm text-ink/55">PNG, JPG, SVG or PDF</span>
+        </button>
+      ) : (
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {logos.map((logo) => (
+            <li key={logo.id} className="group relative">
+              <button
+                type="button"
+                onClick={() => setPreview(logo)}
+                className="flex w-full flex-col overflow-hidden rounded-lg border border-black/8 bg-[#F8F9FA] text-left"
+              >
+                <div className="relative flex aspect-square items-center justify-center">
+                  {logo.previewUrl ? (
+                    <img src={logo.previewUrl} alt="" className="h-full w-full object-contain p-2" />
+                  ) : (
+                    <FileText className="h-8 w-8 text-muted-foreground" />
+                  )}
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/40 group-hover:opacity-100">
+                    <Eye className="h-5 w-5 text-white" />
+                  </span>
+                </div>
+                <div className="truncate bg-white px-2 py-1.5 text-xs">{logo.file.name}</div>
+              </button>
+              <button
+                type="button"
+                aria-label="Remove"
+                onClick={() => onRemove(logo.id)}
+                className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border border-black/10 bg-white text-muted-foreground shadow-sm hover:bg-destructive hover:text-white"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </li>
+          ))}
           <li>
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="flex aspect-square w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-border text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+              className="flex aspect-square w-full flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-black/15 text-muted-foreground hover:border-primary/40 hover:text-primary"
             >
               <Plus className="h-5 w-5" />
-              <span className="text-xs font-medium">Add more</span>
+              <span className="text-xs">Add</span>
             </button>
           </li>
         </ul>
       )}
 
-      <Dialog open={!!preview} onOpenChange={(open) => !open && setPreview(null)}>
-        <DialogContent className="max-w-lg sm:rounded-2xl">
+      <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
+        <DialogContent className="max-w-lg rounded-xl">
           <DialogHeader>
             <DialogTitle className="truncate pr-6">{preview?.file.name}</DialogTitle>
             <DialogDescription>
-              {preview ? `${(preview.file.size / 1024).toFixed(1)} KB · ${preview.file.type || "file"}` : "Preview"}
+              {preview ? `${(preview.file.size / 1024).toFixed(1)} KB` : "Preview"}
             </DialogDescription>
           </DialogHeader>
-          <div className="flex max-h-[60vh] items-center justify-center overflow-auto rounded-xl border border-border bg-muted/30 p-4">
+          <div className="flex max-h-[55vh] items-center justify-center rounded-lg bg-[#F8F9FA] p-4">
             {preview?.previewUrl ? (
-              <img src={preview.previewUrl} alt={preview.file.name} className="max-h-[55vh] max-w-full object-contain" />
-            ) : preview ? (
-              <div className="flex flex-col items-center gap-3 py-10 text-center">
-                <FileText className="h-14 w-14 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">Preview isn’t available for this file type.</p>
-              </div>
-            ) : null}
+              <img src={preview.previewUrl} alt="" className="max-h-[50vh] max-w-full object-contain" />
+            ) : (
+              <FileText className="h-12 w-12 text-muted-foreground" />
+            )}
           </div>
         </DialogContent>
       </Dialog>
@@ -851,8 +931,6 @@ function ExcelOption() {
 
   const downloadTemplate = () => {
     const wb = XLSX.utils.book_new();
-
-    // Single Order sheet: company block first, then personal-details headers underneath
     const orderSheet: (string | number)[][] = [
       ["ATOMCARD ORDER TEMPLATE"],
       ["Fill company details first, then add one row per person under Personal details."],
@@ -863,7 +941,7 @@ function ExcelOption() {
       [],
       [],
       ["PERSONAL DETAILS"],
-      ["One row = one person / one card. Keep this header row. Leave a cell blank if you don’t have that info."],
+      ["One row = one person / one card."],
       [...USER_TEMPLATE_HEADERS],
       [
         "Alex Rivera",
@@ -877,47 +955,11 @@ function ExcelOption() {
         "alex@company.com",
         "alex@gmail.com",
       ],
-      [
-        "Jordan Lee",
-        "Product Designer",
-        "+255711111111",
-        "personal",
-        "yes",
-        "",
-        "",
-        "",
-        "jordan@company.com",
-        "",
-      ],
-      ["", "", "", "", "", "", "", "", "", ""],
-      ["", "", "", "", "", "", "", "", "", ""],
-      ["", "", "", "", "", "", "", "", "", ""],
     ];
-
     const wsOrder = XLSX.utils.aoa_to_sheet(orderSheet);
-    wsOrder["!cols"] = [
-      { wch: 48 },
-      { wch: 28 },
-      { wch: 24 },
-      { wch: 28 },
-      { wch: 28 },
-      { wch: 24 },
-      { wch: 28 },
-      { wch: 28 },
-      { wch: 24 },
-      { wch: 24 },
-    ];
-    // Merge title cells for readability
-    wsOrder["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } },
-      { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } },
-      { s: { r: 3, c: 0 }, e: { r: 3, c: 1 } },
-      { s: { r: 15, c: 0 }, e: { r: 15, c: 4 } },
-      { s: { r: 16, c: 0 }, e: { r: 16, c: 4 } },
-    ];
+    wsOrder["!cols"] = Array(10).fill({ wch: 24 });
     XLSX.utils.book_append_sheet(wb, wsOrder, "Order form");
 
-    // Extra sheet dedicated to personal rows (easier for large teams)
     const personalOnly = [
       ["PERSONAL DETAILS — one row per person"],
       [...USER_TEMPLATE_HEADERS],
@@ -933,28 +975,14 @@ function ExcelOption() {
         "alex@company.com",
         "alex@gmail.com",
       ],
-      [
-        "Jordan Lee",
-        "Product Designer",
-        "+255711111111",
-        "personal",
-        "yes",
-        "",
-        "",
-        "",
-        "jordan@company.com",
-        "",
-      ],
     ];
     const wsPersonal = XLSX.utils.aoa_to_sheet(personalOnly);
     wsPersonal["!cols"] = USER_TEMPLATE_HEADERS.map((h) => ({
       wch: Math.max(18, Math.min(36, h.length + 4)),
     }));
-    wsPersonal["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }];
     XLSX.utils.book_append_sheet(wb, wsPersonal, "Personal details");
-
     XLSX.writeFile(wb, "atomcard-order-template.xlsx");
-    toast.success("Template downloaded — company first, then personal details headers below.");
+    toast.success("Template downloaded");
   };
 
   const onUpload = async (file: File) => {
@@ -966,17 +994,10 @@ function ExcelOption() {
         wb.Sheets["Order form"] ??
         wb.Sheets["Users"] ??
         wb.Sheets[wb.SheetNames[0]];
-
-      // If Order form sheet, find the personal header row and parse from there
       const raw = XLSX.utils.sheet_to_json<string[]>(preferred, { header: 1, defval: "" });
       const headerIdx = raw.findIndex(
-        (row) =>
-          Array.isArray(row) &&
-          String(row[0] || "")
-            .toLowerCase()
-            .includes("full name"),
+        (row) => Array.isArray(row) && String(row[0] || "").toLowerCase().includes("full name"),
       );
-
       let data: Record<string, unknown>[] = [];
       if (headerIdx >= 0) {
         const headers = (raw[headerIdx] as string[]).map(String);
@@ -993,13 +1014,12 @@ function ExcelOption() {
       } else {
         data = XLSX.utils.sheet_to_json<Record<string, unknown>>(preferred);
       }
-
       setRows(data);
       setFileName(file.name);
-      toast.success(`${file.name} parsed — ${data.length} row${data.length === 1 ? "" : "s"} detected.`);
+      toast.success(`${data.length} row${data.length === 1 ? "" : "s"} detected`);
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't read that file. Make sure it's a valid .xlsx.");
+      toast.error("Couldn't read that file.");
     }
   };
 
@@ -1007,12 +1027,10 @@ function ExcelOption() {
 
   const submitExcelOrder = async () => {
     if (!rows?.length) return toast.error("Upload a completed Excel file first.");
-
     const tableLines = [
       headers.join(" | "),
       ...rows.map((r) => headers.map((h) => String(r[h] ?? "")).join(" | ")),
     ].join("\n");
-
     const message = [
       "ATOMCARD ORDER — Excel upload",
       `File: ${fileName}`,
@@ -1021,29 +1039,26 @@ function ExcelOption() {
       "PERSONAL DETAILS (from spreadsheet)",
       tableLines,
     ].join("\n");
-
-    // Best-effort reply email from first Work email / Personal email / any email-looking cell
     const replyEmail =
       rows
         .map((r) => {
-          const work = String(r["Work email"] ?? r["work email"] ?? "").trim();
-          const personal = String(r["Personal email"] ?? r["personal email"] ?? "").trim();
+          const work = String(r["Work email"] ?? "").trim();
+          const personal = String(r["Personal email"] ?? "").trim();
           return work || personal;
         })
-        .find(Boolean) || "hello@atomcard.co.tz";
-
-    const firstName = String(rows[0]?.["Full name"] ?? rows[0]?.["full name"] ?? "Excel order").trim();
+        .find(Boolean) || "orders@atomcards.co.tz";
+    const firstName = String(rows[0]?.["Full name"] ?? "Excel order").trim();
 
     setSubmitting(true);
     try {
       await submitToWeb3Forms({
         name: firstName,
         email: replyEmail,
-        subject: `AtomCard order — Excel (${rows.length} row${rows.length === 1 ? "" : "s"}) — ${fileName}`,
+        subject: `AtomCard order — Excel (${rows.length} rows) — ${fileName}`,
         message,
       });
       setSubmitted(true);
-      toast.success("Order request sent — we'll be in touch.");
+      toast.success("Order submitted");
     } catch (err) {
       console.error(err);
       toast.error(err instanceof Error ? err.message : "Could not submit order.");
@@ -1054,261 +1069,94 @@ function ExcelOption() {
 
   if (submitted) {
     return (
-      <Card className="border-border shadow-lift">
-        <CardContent className="p-10 text-center">
+      <FormCard accent>
+        <div className="py-6 text-center">
           <CheckCircle2 className="mx-auto h-12 w-12 text-primary" />
-          <h3 className="mt-4 text-2xl font-semibold">Thanks — we got it.</h3>
-          <p className="mt-2 text-muted-foreground">
-            Your Excel order ({fileName}) was sent. We’ll follow up within 1 business day.
+          <h2 className="mt-4 text-2xl font-normal">Order received</h2>
+          <p className="mt-3 text-muted-foreground">
+            File <span className="text-ink">{fileName}</span> was submitted successfully.
           </p>
-          <Button asChild className="mt-6 rounded-full">
-            <Link to="/">Back to homepage</Link>
+          <Button asChild className="mt-8 h-11 rounded-full">
+            <Link to="/">Back to AtomCards</Link>
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </FormCard>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="shadow-lift">
-          <CardHeader>
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <Download className="h-5 w-5" />
-            </div>
-            <CardTitle className="pt-2 text-lg">1. Download template</CardTitle>
-            <CardDescription>
-              One sheet with <span className="text-foreground">Company details</span> first, then{" "}
-              <span className="text-foreground">Personal details</span> headers below — plus a dedicated Personal sheet.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={downloadTemplate} className="rounded-full">
-              <FileSpreadsheet className="h-4 w-4" /> Download .xlsx
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lift">
-          <CardHeader>
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <Upload className="h-5 w-5" />
-            </div>
-            <CardTitle className="pt-2 text-lg">2. Upload completed file</CardTitle>
-            <CardDescription>Keep the header row. Fill each person’s details, then upload.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <input
-              ref={inputRef}
-              type="file"
-              accept=".xlsx,.xls"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) onUpload(f);
-              }}
-            />
-            <Button onClick={() => inputRef.current?.click()} variant="outline" className="rounded-full">
-              <Upload className="h-4 w-4" /> Upload .xlsx
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="shadow-lift">
-        <CardHeader>
-          <CardTitle className="text-lg">What’s inside the template</CardTitle>
-          <CardDescription>
-            After company fields you’ll see the personal details header row — fill one row per person.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <Badge variant="secondary" className="rounded-full">1</Badge>
-              <h4 className="text-sm font-semibold">Company details</h4>
-            </div>
-            <div className="overflow-x-auto rounded-xl border border-border">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-muted/50">
-                    <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Field
-                    </th>
-                    <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Value
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {COMPANY_TEMPLATE_FIELDS.map((field) => (
-                    <tr key={field} className="border-b border-border/60">
-                      <td className="px-3 py-2 font-medium text-ink">{field}</td>
-                      <td className="px-3 py-2 text-muted-foreground">— fill in Excel —</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <Badge variant="secondary" className="rounded-full">2</Badge>
-              <h4 className="text-sm font-semibold">Personal details headers</h4>
-            </div>
-            <p className="mb-2 text-xs text-muted-foreground">
-              These columns appear directly under company details in the downloaded file.
-            </p>
-            <div className="overflow-x-auto rounded-xl border border-border">
-              <table className="w-full min-w-[720px] text-left text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-primary/5">
-                    {USER_TEMPLATE_HEADERS.map((h) => (
-                      <th
-                        key={h}
-                        className="whitespace-nowrap px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-primary"
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-border/60 text-muted-foreground">
-                    <td className="px-3 py-2.5">Alex Rivera</td>
-                    <td className="px-3 py-2.5">Head of Sales</td>
-                    <td className="px-3 py-2.5">+255…</td>
-                    <td className="px-3 py-2.5">personal</td>
-                    <td className="px-3 py-2.5">yes</td>
-                    <td className="px-3 py-2.5">+255…</td>
-                    <td className="px-3 py-2.5">office</td>
-                    <td className="px-3 py-2.5">no</td>
-                    <td className="px-3 py-2.5">alex@…</td>
-                    <td className="px-3 py-2.5">alex@gmail…</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {rows && (
-        <Card className="shadow-lift overflow-hidden">
-          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-4 space-y-0">
-            <div>
-              <CardTitle className="text-lg">Preview: {fileName}</CardTitle>
-              <CardDescription>
-                {rows.length} user row{rows.length === 1 ? "" : "s"} detected.
-              </CardDescription>
-            </div>
-            <Button onClick={submitExcelOrder} disabled={submitting} className="rounded-full">
-              {submitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Sending…
-                </>
-              ) : (
-                "Submit order"
-              )}
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                    {headers.map((h) => (
-                      <th key={h} className="py-2 pr-4 font-medium">
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.slice(0, 8).map((r, i) => (
-                    <tr key={i} className="border-b border-border/60">
-                      {headers.map((h) => (
-                        <td key={h} className="py-2 pr-4">
-                          {String(r[h] ?? "")}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {rows.length > 8 && (
-                <p className="mt-3 text-xs text-muted-foreground">…and {rows.length - 8} more.</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-}
-
-function SubPanel({
-  icon: Icon,
-  title,
-  hint,
-  children,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  hint?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="rounded-xl border border-border/80 bg-gradient-to-br from-muted/40 via-background to-background p-4 md:p-5">
-      <div className="mb-4 flex items-start gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Icon className="h-4 w-4" />
-        </span>
-        <div>
-          <h4 className="text-sm font-semibold text-ink">{title}</h4>
-          {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
+    <div className="space-y-3">
+      <FormCard accent>
+        <h1 className="text-[28px] font-normal tracking-tight">Upload Excel</h1>
+        <div className="mt-3 border-t border-black/8 pt-3">
+          <p className="text-[14px] text-muted-foreground">
+            Download the template, fill company + personal details, then upload it back.
+          </p>
         </div>
-      </div>
-      {children}
-    </div>
-  );
-}
+      </FormCard>
 
-function FormSection({
-  icon: Icon,
-  step,
-  title,
-  description,
-  action,
-  children,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  step: string;
-  title: string;
-  description: string;
-  action?: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <Card className="border-border shadow-lift overflow-hidden">
-      <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-4 border-b border-border/70 bg-muted/20">
-        <div className="flex gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Icon className="h-5 w-5" />
+      <FormCard>
+        <button type="button" onClick={downloadTemplate} className="flex w-full items-center gap-3 text-left">
+          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Download className="h-5 w-5" />
           </span>
           <div>
-            <p className="font-mono-tech text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-              Step {step}
-            </p>
-            <CardTitle className="mt-1 text-lg">{title}</CardTitle>
-            <CardDescription className="mt-1 max-w-xl">{description}</CardDescription>
+            <p className="text-[16px]">1. Download template</p>
+            <p className="text-sm text-muted-foreground">Company + personal headers included</p>
           </div>
-        </div>
-        {action}
-      </CardHeader>
-      <CardContent className="pt-6">{children}</CardContent>
-    </Card>
+          <FileSpreadsheet className="ml-auto h-5 w-5 text-muted-foreground" />
+        </button>
+      </FormCard>
+
+      <FormCard>
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="flex w-full items-center gap-3 text-left"
+        >
+          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Upload className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="text-[16px]">2. Upload completed file</p>
+            <p className="text-sm text-muted-foreground">.xlsx or .xls</p>
+          </div>
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".xlsx,.xls"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void onUpload(f);
+          }}
+        />
+      </FormCard>
+
+      {rows && (
+        <FormCard>
+          <p className="text-[16px]">{fileName}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {rows.length} person row{rows.length === 1 ? "" : "s"}
+          </p>
+          <div className="mt-3 max-h-40 overflow-auto text-sm text-muted-foreground">
+            {rows.slice(0, 6).map((r, i) => (
+              <p key={i} className="truncate border-b border-black/5 py-1.5">
+                {headers.map((h) => String(r[h] ?? "")).filter(Boolean).join(" · ")}
+              </p>
+            ))}
+          </div>
+          <Button
+            onClick={() => void submitExcelOrder()}
+            disabled={submitting}
+            className="mt-4 h-11 rounded-md"
+          >
+            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            Submit
+          </Button>
+        </FormCard>
+      )}
+    </div>
   );
 }
