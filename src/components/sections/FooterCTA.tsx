@@ -13,7 +13,7 @@ export function FooterCTA() {
             </h2>
             <p className="mt-5 text-white/70 max-w-md leading-relaxed">Your AtomCard ships in under a week. Every update after is free, forever.</p>
             <Button asChild size="lg" className="mt-7 rounded-full h-12 px-6 bg-white text-ink hover:bg-white/90">
-              <a href="#pricing">Get your AtomCard <ArrowRight className="h-4 w-4" /></a>
+              <a href="/order">Get your AtomCard <ArrowRight className="h-4 w-4" /></a>
             </Button>
           </div>
           <div className="md:justify-self-end">

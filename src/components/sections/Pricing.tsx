@@ -33,7 +33,7 @@ export function Pricing() {
               <h3 className={`text-lg font-semibold ${t.featured ? "text-white" : "text-ink"}`}>{t.name}</h3>
               <p className={`text-sm mt-1 ${t.featured ? "text-white/70" : "text-muted-foreground"}`}>{t.blurb}</p>
               <Button asChild className={`mt-6 w-full h-11 rounded-xl ${t.featured ? "bg-white text-ink hover:bg-white/90" : ""}`}>
-                <a href="#">{t.cta}</a>
+                <a href="/order">{t.cta}</a>
               </Button>
               <ul className="mt-7 space-y-3 text-sm">
                 {t.features.map((f) => (

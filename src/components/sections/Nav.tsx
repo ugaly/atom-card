@@ -28,7 +28,7 @@ export function Nav() {
         </nav>
         <div className="hidden md:flex items-center gap-2">
           <Button asChild variant="ghost" size="sm"><a href="/c/demo">View live card</a></Button>
-          <Button asChild size="sm" className="rounded-full px-4"><a href="#pricing">Get yours</a></Button>
+          <Button asChild size="sm" className="rounded-full px-4"><a href="/order">Get yours</a></Button>
         </div>
         <div className="md:hidden">
           <Sheet>
@@ -40,7 +40,7 @@ export function Nav() {
                 {links.map((l) => (
                   <a key={l.href} href={l.href} className="text-ink">{l.label}</a>
                 ))}
-                <Button asChild className="mt-3 rounded-full"><a href="#pricing">Get yours</a></Button>
+                <Button asChild className="mt-3 rounded-full"><a href="/order">Get yours</a></Button>
               </div>
             </SheetContent>
           </Sheet>

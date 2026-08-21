@@ -97,7 +97,7 @@ function CardLanding() {
       {/* Footer CTA */}
       <footer className="relative z-10 mt-auto pb-8 px-5">
         <Link
-          to="/"
+          to="/order"
           className="mx-auto block max-w-md rounded-2xl bg-ink text-white text-center py-4 text-sm font-medium hover:bg-ink/90 transition-colors shadow-lift"
         >
           Get your own AtomCard →

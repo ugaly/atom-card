@@ -41,7 +41,7 @@ export function Hero() {
             className="mt-8 flex flex-wrap items-center gap-3"
           >
             <Button asChild size="lg" className="h-12 rounded-full px-6 text-sm">
-              <a href="#pricing">Get your AtomCard <ArrowRight className="h-4 w-4" /></a>
+              <a href="/order">Get your AtomCard <ArrowRight className="h-4 w-4" /></a>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 rounded-full px-6 text-sm border-border">
               <a href="/c/demo">Try a live card →</a>
