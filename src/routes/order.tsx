@@ -1046,7 +1046,7 @@ function ExcelOption() {
           const personal = String(r["Personal email"] ?? "").trim();
           return work || personal;
         })
-        .find(Boolean) || "orders@atomcards.co.tz";
+        .find(Boolean) || "info@clockwisetz.com";
     const firstName = String(rows[0]?.["Full name"] ?? "Excel order").trim();
 
     setSubmitting(true);

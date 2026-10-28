@@ -37,6 +37,7 @@ export function FooterCTA() {
             <span>© {new Date().getFullYear()} AtomCard. Made for people who meet people.</span>
           </div>
           <div className="flex items-center gap-4">
+            <a href="/terms" className="hover:text-white">Terms</a>
             <a href="#" aria-label="Twitter" className="hover:text-white"><Twitter className="h-4 w-4" /></a>
             <a href="#" aria-label="Instagram" className="hover:text-white"><Instagram className="h-4 w-4" /></a>
             <a href="#" aria-label="LinkedIn" className="hover:text-white"><Linkedin className="h-4 w-4" /></a>

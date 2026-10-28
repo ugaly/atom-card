@@ -67,13 +67,13 @@ export function Contact() {
             </p>
 
             <div className="mt-8 space-y-3">
-              <a href="tel:+255123456789" className="flex items-center gap-3 text-white/80 hover:text-white transition-colors">
+              <a href="tel:+255725755242" className="flex items-center gap-3 text-white/80 hover:text-white transition-colors">
                 <Phone className="h-4 w-4" />
-                <span className="text-sm">+255 123 456 789</span>
+                <span className="text-sm">+255 725 755 242</span>
               </a>
-              <a href="mailto:hello@atomcard.co.tz" className="flex items-center gap-3 text-white/80 hover:text-white transition-colors">
+              <a href="mailto:info@clockwisetz.com" className="flex items-center gap-3 text-white/80 hover:text-white transition-colors">
                 <Mail className="h-4 w-4" />
-                <span className="text-sm">hello@atomcard.co.tz</span>
+                <span className="text-sm">info@clockwisetz.com</span>
               </a>
             </div>
 
